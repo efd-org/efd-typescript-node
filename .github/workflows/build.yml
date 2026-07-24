@@ -27,9 +27,7 @@ jobs:
   build:
     name: Node.js Build
     if: "vars.ACTIVE_CLOUD == 'aws'"
-    runs-on:
-      - self-hosted
-      - linux
+    runs-on: self-hosted
     env:
       AWS_REGION: us-east-1
       AWS_DEFAULT_REGION: us-east-1
