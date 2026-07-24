@@ -43,6 +43,28 @@ jobs:
           ECR_REPOSITORY: efd-typescript-node
           IMAGE_TAG: "${{ github.sha }}"
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:efd-typescript-node .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:efd-typescript-node -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:efd-typescript-node
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+  deploy:
+    name: Deploy to ECS
+    if: "vars.ACTIVE_CLOUD == 'aws'"
+    needs: build
+    runs-on: self-hosted
+    env:
+      AWS_REGION: us-east-1
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Force new deployment on ECS service
+        run: |
+          aws ecs update-service --cluster "${{ secrets.ECS_CLUSTER }}" --service "${{ secrets.ECS_SERVICE }}" --force-new-deployment
