@@ -9,6 +9,7 @@ on:
       - .github/workflows/**
       - package.json
       - src/**
+      - "**"
   pull_request:
     branches:
       - main
