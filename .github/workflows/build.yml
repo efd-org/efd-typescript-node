@@ -27,7 +27,9 @@ jobs:
   build:
     name: Node.js Build
     if: "vars.ACTIVE_CLOUD == 'aws'"
-    "runs-on": self-hosted
+    runs-on:
+      - self-hosted
+      - linux
     env:
       AWS_REGION: us-east-1
       AWS_DEFAULT_REGION: us-east-1
@@ -42,6 +44,6 @@ jobs:
           ECR_REPOSITORY: efd-typescript-node
           IMAGE_TAG: "${{ github.sha }}"
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY: efd-typescript-node .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:efd-typescript-node .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY: efd-typescript-node
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:efd-typescript-node
